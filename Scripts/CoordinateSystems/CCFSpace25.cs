@@ -25,21 +25,21 @@ namespace CoordinateSpaces
 
         public override Vector3 Space2World(Vector3 coord)
         {
-            return Space2WorldRot(coord/40f) - _zeroOffset;
+            return Space2WorldAxisChange(coord/40f) - _zeroOffset;
         }
 
         public override Vector3 World2Space(Vector3 world)
         {
-            Vector3 coord = World2SpaceRot(world + _zeroOffset) * 40f;
+            Vector3 coord = World2SpaceAxisChange(world + _zeroOffset) * 40f;
             return new Vector3(coord.x, coord.y, coord.z);
         }
 
-        public override Vector3 Space2WorldRot(Vector3 coord)
+        public override Vector3 Space2WorldAxisChange(Vector3 coord)
         {
             return new Vector3(-coord.z, -coord.y, coord.x);
         }
 
-        public override Vector3 World2SpaceRot(Vector3 world)
+        public override Vector3 World2SpaceAxisChange(Vector3 world)
         {
             return new Vector3(world.z, -world.y, -world.x);
         }

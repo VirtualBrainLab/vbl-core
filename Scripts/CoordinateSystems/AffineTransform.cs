@@ -50,7 +50,7 @@ namespace CoordinateTransforms
         /// </summary>
         /// <param name="coordSpace"></param>
         /// <returns></returns>
-        public override Vector3 Space2TransformRot(Vector3 coordSpace)
+        public override Vector3 Space2TransformAxisChange(Vector3 coordSpace)
         {
             return new Vector3(
                 Mathf.Sign(_scaling.x) * coordSpace.x,
@@ -65,7 +65,7 @@ namespace CoordinateTransforms
         /// </summary>
         /// <param name="coordTransformed"></param>
         /// <returns></returns>
-        public override Vector3 Transform2SpaceRot(Vector3 coordTransformed)
+        public override Vector3 Transform2SpaceAxisChange(Vector3 coordTransformed)
         {
             return new Vector3(
                 Mathf.Sign(_inverseScaling.x) * coordTransformed.x,

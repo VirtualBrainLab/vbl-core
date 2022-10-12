@@ -23,9 +23,9 @@ namespace CoordinateTransforms
         /// <returns></returns>
         public abstract Vector3 Space2Transform(Vector3 coordSpace);
 
-        public abstract Vector3 Transform2SpaceRot(Vector3 coordTransformed);
+        public abstract Vector3 Transform2SpaceAxisChange(Vector3 coordTransformed);
 
-        public abstract Vector3 Space2TransformRot(Vector3 coordSpace);
+        public abstract Vector3 Space2TransformAxisChange(Vector3 coordSpace);
 
 
         public override string ToString()
