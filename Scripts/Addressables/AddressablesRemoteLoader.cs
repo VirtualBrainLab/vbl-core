@@ -52,7 +52,9 @@ public class AddressablesRemoteLoader : MonoBehaviour
     {
         if (request.url.Contains("http://"))
             request.url = request.url.Replace("http://", "https://");
+#if UNITY_EDITOR
         Debug.Log(request.url);
+#endif
     }
 
     public void ChangeCatalogServer(string newAddressablesStorageRemotePath) {
