@@ -7,8 +7,6 @@ public class CCFModelControl : MonoBehaviour
 {
     public CCFTree tree;
 
-    public int heightPerToggle = 20;
-
     //private int lowQualityDepth = 5;
     //private int[] lowQualityDefaults = new int[] { 315, 343, 698, 1089, 512 };
     private int highQualityDepth = 6;
