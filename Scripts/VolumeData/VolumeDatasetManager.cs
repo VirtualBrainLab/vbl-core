@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class VolumeDatasetManager : MonoBehaviour
 {
-    private CCFAnnotationDataset annotationDataset;
+    public static CCFAnnotationDataset AnnotationDataset;
     
     // Annotations
     private byte[] datasetIndexes_bytes;
@@ -47,7 +44,7 @@ public class VolumeDatasetManager : MonoBehaviour
 
         Debug.Log("(VDManager) Annotation dataset files loaded, building dataset");
 
-        annotationDataset = new CCFAnnotationDataset((528, 320, 456), annotationIndexes_shorts, annotationMap_ints, datasetIndexes_bytes);
+        AnnotationDataset = new CCFAnnotationDataset((528, 320, 456), annotationIndexes_shorts, annotationMap_ints, datasetIndexes_bytes);
         annotationIndexes_shorts = null;
         annotationMap_ints = null;
 
@@ -60,6 +57,6 @@ public class VolumeDatasetManager : MonoBehaviour
 
     public CCFAnnotationDataset GetAnnotationDataset()
     {
-        return annotationDataset;
+        return AnnotationDataset;
     }
 }
