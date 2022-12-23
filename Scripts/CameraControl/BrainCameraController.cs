@@ -36,7 +36,7 @@ public class BrainCameraController : MonoBehaviour
     private float totalPitch;
     private float totalSpin;
 
-    private bool blockBrainControl;
+    public static bool BlockBrainControl;
 
     // auto-rotation
     private bool autoRotate;
@@ -81,14 +81,14 @@ public class BrainCameraController : MonoBehaviour
         }
 
         // Now check if the mouse wheel is being held down
-        if (Input.GetMouseButton(1) && !blockBrainControl && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButton(1) && !BlockBrainControl && !EventSystem.current.IsPointerOverGameObject())
         {
             mouseDownOverBrain = true;
             mouseButtonDown = 1;
         }
 
         // Now deal with dragging
-        if (Input.GetMouseButtonDown(0) && !blockBrainControl && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButtonDown(0) && !BlockBrainControl && !EventSystem.current.IsPointerOverGameObject())
         {
             //BrainCameraDetectTargets();
             mouseDownOverBrain = true;
@@ -107,7 +107,7 @@ public class BrainCameraController : MonoBehaviour
 
     public void SetControlBlock(bool state)
     {
-        blockBrainControl = state;
+        BlockBrainControl = state;
     }
 
 

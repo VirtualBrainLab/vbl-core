@@ -17,7 +17,7 @@ public class VolumeDatasetManager : MonoBehaviour
     /// 
     /// Asynchronous dependencies: inPlaneSlice, localPrefs
     /// </summary>
-    public async Task<bool> LoadAnnotationDataset(List<Action> callbackList)
+    public async Task<bool> LoadAnnotationDataset()
     {
         bool finished = true;
 
@@ -47,10 +47,6 @@ public class VolumeDatasetManager : MonoBehaviour
         AnnotationDataset = new CCFAnnotationDataset((528, 320, 456), annotationIndexes_shorts, annotationMap_ints, datasetIndexes_bytes);
         annotationIndexes_shorts = null;
         annotationMap_ints = null;
-
-        // Run any callbacks
-        foreach (Action callback in callbackList)
-            callback();
 
         return finished;
     }
