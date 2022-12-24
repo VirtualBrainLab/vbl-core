@@ -6,11 +6,26 @@ using UnityEngine;
 public class VolumeDatasetManager : MonoBehaviour
 {
     public static CCFAnnotationDataset AnnotationDataset;
+    public static Texture3D AnnotationDatasetTexture3D;
     
     // Annotations
     private byte[] datasetIndexes_bytes;
     private ushort[] annotationIndexes_shorts;
     private uint[] annotationMap_ints;
+
+    private static TaskCompletionSource<bool> _texture3DLoadedSource;
+
+    private async void Awake()
+    {
+        _texture3DLoadedSource = new TaskCompletionSource<bool>();
+        Task<Texture3D> textureTask = AddressablesRemoteLoader.LoadAnnotationTexture();
+        await textureTask;
+
+        AnnotationDatasetTexture3D = textureTask.Result;
+        _texture3DLoadedSource.SetResult(true);
+
+        Debug.Log("(VDManager) Annotation dataset texture loaded");
+    }
 
     /// <summary>
     /// Loads the annotation dataset files from their Addressable AssetReference objects
@@ -51,8 +66,9 @@ public class VolumeDatasetManager : MonoBehaviour
         return finished;
     }
 
-    public CCFAnnotationDataset GetAnnotationDataset()
-    {
-        return AnnotationDataset;
+    public static Task<bool> Texture3DLoaded()
+    { 
+        return _texture3DLoadedSource.Task;
     }
+
 }
