@@ -14,10 +14,13 @@ public class VolumeDatasetManager : MonoBehaviour
     private uint[] annotationMap_ints;
 
     private static TaskCompletionSource<bool> _texture3DLoadedSource;
-
-    private async void Awake()
+    private void Awake()
     {
         _texture3DLoadedSource = new TaskCompletionSource<bool>();
+    }
+
+    private async void Start()
+    {
         Task<Texture3D> textureTask = AddressablesRemoteLoader.LoadAnnotationTexture();
         await textureTask;
 

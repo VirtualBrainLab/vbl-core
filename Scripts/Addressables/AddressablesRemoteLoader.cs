@@ -16,8 +16,7 @@ public class AddressablesRemoteLoader : MonoBehaviour
     private string addressablesStorageTargetPath;
 
     // Server setup task
-    private TaskCompletionSource<bool> catalogTargetSetSource;
-    private Task<bool> catalogTargetSetTask;
+    private TaskCompletionSource<bool> catalogLoadedSource;
 
     // Catalog load task
     private static Task catalogLoadedTask;
@@ -28,23 +27,15 @@ public class AddressablesRemoteLoader : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        catalogTargetSetSource = new TaskCompletionSource<bool>();
-        catalogTargetSetTask = catalogTargetSetSource.Task;
+        //Register to override WebRequests Addressables creates to download
+        Addressables.WebRequestOverride = EditWebRequestURL;
+
+        catalogLoadedSource = new TaskCompletionSource<bool>();
+        catalogLoadedTask = catalogLoadedSource.Task;
 
         if (!delayCatalogLoad) {
             LoadCatalog();
         }
-
-        // Warning: I think there must be a better way to do this, but because we only initialize this Task
-        // in Awake() we **CANNOT** call any of the Load() functions from another classes Awake() function.
-        // Technically this is consistent with Unity's Awake/Start architecture, but it's still a little annoying.
-        catalogLoadedTask = AsyncLink2Catalog();
-    }
-
-    //Register to override WebRequests Addressables creates to download
-    private void Start()
-    {
-        Addressables.WebRequestOverride = EditWebRequestURL;
     }
 
     //Override the url of the WebRequest, the request passed to the method is what would be used as standard by Addressables.
@@ -58,21 +49,33 @@ public class AddressablesRemoteLoader : MonoBehaviour
     }
 
     public void ChangeCatalogServer(string newAddressablesStorageRemotePath) {
-        this.addressablesStorageRemotePath = newAddressablesStorageRemotePath;
+        addressablesStorageRemotePath = newAddressablesStorageRemotePath;
     }
 
-    public void LoadCatalog() {
+    public async void LoadCatalog() {
         RuntimePlatform platform = Application.platform;
         if (platform == RuntimePlatform.WindowsPlayer || platform == RuntimePlatform.WindowsEditor)
             addressablesStorageTargetPath = addressablesStorageRemotePath + "/StandaloneWindows64/catalog_" + buildVersion + fileEnding;
         else if (platform == RuntimePlatform.WebGLPlayer)
             addressablesStorageTargetPath = addressablesStorageRemotePath + "/WebGL/catalog_" + buildVersion + fileEnding;
-        else if (platform == RuntimePlatform.OSXEditor)
+        else if (platform == RuntimePlatform.OSXEditor || platform == RuntimePlatform.OSXPlayer)
             addressablesStorageTargetPath = addressablesStorageRemotePath + "/StandaloneOSX/catalog_" + buildVersion + fileEnding;
         else {
             Debug.LogError(string.Format("Running on {0} we do NOT have a built Addressables Storage bundle",platform));
         }
-        catalogTargetSetSource.SetResult(true);
+
+#if UNITY_EDITOR
+        Debug.Log("(AddressablesStorage) Loading catalog v" + buildVersion);
+#endif
+        //Load a catalog and automatically release the operation handle.
+        Debug.Log("(AddressablesStorage) Loading content catalog from: " + GetAddressablesPath());
+
+        AsyncOperationHandle<IResourceLocator> catalogLoadHandle
+            = Addressables.LoadContentCatalogAsync(GetAddressablesPath(), true);
+
+        await catalogLoadHandle.Task;
+
+        catalogLoadedSource.SetResult(true);
     }
 
     public Task GetCatalogLoadedTask() {
@@ -82,29 +85,6 @@ public class AddressablesRemoteLoader : MonoBehaviour
     public string GetAddressablesPath()
     {
         return addressablesStorageTargetPath;
-    }
-
-    /// <summary>
-    /// Load the remote catalog
-    /// </summary>
-    public async Task<bool> AsyncLink2Catalog()
-    {
-        await catalogTargetSetTask;
-
-#if UNITY_EDITOR
-        Debug.Log("(AddressablesStorage) Loading catalog v" + buildVersion);
-#endif
-        bool finished = true;
-        //Load a catalog and automatically release the operation handle.
-        Debug.Log("Loading content catalog from: " + GetAddressablesPath());
-
-        AsyncOperationHandle<IResourceLocator> catalogLoadHandle
-            = Addressables.LoadContentCatalogAsync(GetAddressablesPath(), true);
-
-        await catalogLoadHandle.Task;
-
-        Debug.Log("Content catalog loaded");
-        return finished;
     }
 
     public static async Task<Mesh> LoadCCFMesh(string objPath)
