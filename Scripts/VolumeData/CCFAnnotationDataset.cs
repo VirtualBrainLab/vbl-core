@@ -58,39 +58,31 @@ public class CCFAnnotationDataset : VolumetricDataset
     }
 
     /// <summary>
-    /// Use the annotation dataset to discover whether there is a surface coordinate by going *up* from the startPosition
+    /// Use the annotation dataset to discover whether there is a surface coordinate by going *down* from a point searchDistance
+    /// *above* the startPos
     /// returns the coordinate in the annotation dataset that corresponds to the surface.
     ///  
     /// Function guarantees that you enter the brain *once* before exiting, so if you start below the brain you need
     /// to enter first to discover the surface coordinate.
     /// </summary>
-    /// <param name="startPos">Starting coordinate in the AnnotationDataset</param>
+    /// <param name="bottomPos">coordinate to go down to</param>
     /// <param name="up"></param>
     /// <returns></returns>
-    public Vector3 FindSurfaceCoordinate(Vector3 startPos, Vector3 up, float searchDistance = 400f)
+    public Vector3 FindSurfaceCoordinate(Vector3 bottomPos, Vector3 up, float searchDistance = 408f)
     {
-        // If we are starting outside of the brain, we will first have to go through the brain
-        bool crossedThroughBrain = ValueAtIndex(startPos) > 0;
+        // We'll start at a point that is pretty far above the brain surface
+        // note that search distance is in 25um units, so this is actually 10000 um up (i.e. the top of the probe)
+        Vector3 topPos = bottomPos + up * searchDistance;
 
-        // Iterate up until you exit the brain
-        // if you started outside, first find when you enter
-        Vector3 endPos = startPos + up * searchDistance;
+        // If by chance we are inside the brain, go farther
+        if (ValueAtIndex(topPos) > 0)
+            topPos = bottomPos + up * searchDistance * 2f;
 
         for (float perc = 0; perc <= 1f; perc += 0.0005f)
         {
-            Vector3 point = Vector3.Lerp(startPos, endPos, perc);
-            if (crossedThroughBrain)
-            {
-                if (ValueAtIndex(point) <= 0)
-                {
-                    return point;
-                }
-            }
-            else
-            {
-                if (ValueAtIndex(point) > 0)
-                    crossedThroughBrain = true;
-            }
+            Vector3 point = Vector3.Lerp(topPos, bottomPos, perc);
+            if (ValueAtIndex(point) > 0)
+                return point;
         }
 
         // If you got here it means you *never* entered and then exited the brain
