@@ -37,4 +37,9 @@ public class CoordinateSpaceManager : MonoBehaviour
     {
         return ActiveCoordinateSpace.Space2World(ActiveCoordinateTransform.Transform2SpaceAxisChange(coordTransformed));
     }
+
+    public static void SetRelativeCoordinate(Vector3 coord)
+    {
+        ActiveCoordinateSpace.RelativeOffset = coord;
+    }
 }
